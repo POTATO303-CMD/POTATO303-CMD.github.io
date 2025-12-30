@@ -9,40 +9,55 @@
     body {
       margin: 0;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-      background: #0f1117;
+      background: radial-gradient(circle at top, #1b1f2a 0%, #0f1117 65%);
       color: #e5e7eb;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .wrapper {
       display: flex;
       justify-content: center;
-      align-items: center;
-      min-height: 100vh;
+      padding: 40px 16px;
     }
 
     .card {
-      background: #161a22;
+      background: rgba(22, 26, 34, 0.88);
+      backdrop-filter: blur(8px);
       padding: 28px;
-      border-radius: 16px;
+      border-radius: 20px;
+      max-width: 460px;
       width: 100%;
-      max-width: 420px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+      box-shadow: 0 30px 60px rgba(0,0,0,0.55);
+      transform-style: preserve-3d;
+      transition: transform 0.15s ease;
     }
 
     h1 {
       margin-top: 0;
-      margin-bottom: 12px;
-      font-size: 24px;
+      font-size: 26px;
+      margin-bottom: 10px;
     }
 
     p {
-      margin: 0 0 20px;
+      margin: 0 0 18px;
       line-height: 1.5;
       color: #9ca3af;
+    }
+
+    .gif {
+      width: 100%;
+      border-radius: 16px;
+      margin: 16px 0;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.45);
+      transform: translateZ(20px);
     }
 
     input, textarea {
       width: 100%;
       background: #0f1117;
       border: 1px solid #2a2f3a;
-      border-radius: 10px;
+      border-radius: 12px;
       padding: 12px;
       margin-bottom: 12px;
       color: #e5e7eb;
@@ -56,19 +71,20 @@
 
     button {
       width: 100%;
-      background: #4f46e5;
+      background: linear-gradient(135deg, #4f46e5, #6366f1);
       border: none;
-      border-radius: 12px;
+      border-radius: 14px;
       padding: 14px;
       color: #fff;
       font-size: 16px;
       font-weight: 600;
       cursor: pointer;
-      transition: 0.2s;
+      transition: transform 0.2s, box-shadow 0.2s;
     }
 
     button:hover {
-      background: #4338ca;
+      transform: translateY(-1px);
+      box-shadow: 0 12px 28px rgba(79,70,229,0.4);
     }
 
     button.loading {
@@ -82,36 +98,59 @@
       text-align: center;
     }
 
-    .status.success {
-      color: #4ade80;
-    }
-
-    .status.error {
-      color: #f87171;
-    }
+    .status.success { color: #4ade80; }
+    .status.error { color: #f87171; }
   </style>
 </head>
 
 <body>
-  <div class="card">
-    <h1>Обслуживание сайтов</h1>
-    <p>
-      Егор Ефремов<br>
-      Поддержка и сопровождение сайтов для бизнеса<br>
-      <strong>от 5000 ₽</strong>
-    </p>
+  <div class="wrapper">
+    <div class="card" id="parallaxCard">
+      <h1>Обслуживание сайтов</h1>
+      <p>
+        Егор Ефремов<br>
+        Поддержка и сопровождение сайтов для бизнеса<br>
+        <strong>от 5000 ₽</strong>
+      </p>
 
-    <form id="contactForm" action="https://formspree.io/f/maqygvoy" method="POST">
-      <input type="text" name="name" placeholder="Ваше имя" required>
-      <input type="text" name="contact" placeholder="Телефон или Telegram" required>
-      <textarea name="message" placeholder="Коротко опишите задачу"></textarea>
-      <button type="submit" id="submitBtn">Отправить заявку</button>
-    </form>
+      <!-- Гиф 1: код -->
+      <img
+        class="gif"
+        src="https://media.giphy.com/media/qgQUggAC3Pfv687qPC/giphy.gif"
+        alt="Работа с кодом">
 
-    <div class="status" id="status"></div>
+      <!-- Гиф 2: поддержка -->
+      <img
+        class="gif"
+        src="https://media.giphy.com/media/ZVik7pBtu9dNS/giphy.gif"
+        alt="Поддержка сайтов">
+
+      <form id="contactForm" action="https://formspree.io/f/maqygvoy" method="POST">
+        <input type="text" name="name" placeholder="Ваше имя" required>
+        <input type="text" name="contact" placeholder="Телефон или Telegram" required>
+        <textarea name="message" placeholder="Коротко опишите задачу"></textarea>
+        <button type="submit" id="submitBtn">Отправить заявку</button>
+      </form>
+
+      <div class="status" id="status"></div>
+    </div>
   </div>
 
   <script>
+    // ПАРАЛЛАКС
+    const card = document.getElementById("parallaxCard");
+
+    document.addEventListener("mousemove", (e) => {
+      const x = (window.innerWidth / 2 - e.clientX) / 30;
+      const y = (window.innerHeight / 2 - e.clientY) / 30;
+      card.style.transform = `rotateY(${x}deg) rotateX(${y}deg)`;
+    });
+
+    document.addEventListener("mouseleave", () => {
+      card.style.transform = "rotateY(0) rotateX(0)";
+    });
+
+    // ФОРМА
     const form = document.getElementById("contactForm");
     const status = document.getElementById("status");
     const button = document.getElementById("submitBtn");
@@ -136,10 +175,7 @@
           form.reset();
           status.textContent = "✅ Заявка отправлена";
           status.className = "status success";
-
-          setTimeout(() => {
-            status.textContent = "";
-          }, 3000);
+          setTimeout(() => status.textContent = "", 3000);
         } else {
           status.textContent = "❌ Ошибка отправки";
           status.className = "status error";
